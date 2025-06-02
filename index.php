@@ -22,15 +22,22 @@ background-image: url('https://images.freeimages.com/images/large-previews/01a/t
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
   padding: 0;
+  z-index: 0;
+}
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6); /* 60% black overlay to dim */
+  z-index: -1;
 }
 
 h1 {
-  font-size: 3rem;
+  text-align: center;
+  margin-top: 40px;
   color: #00f0ff;
-  text-shadow: 0 0 4px #00f0ff; /* Reduced glow */
-  margin-bottom: 30px;
+  text-shadow: 0 0 4px #00f0ff;
 }
-
 form {
   display: flex;
   flex-direction: column;
