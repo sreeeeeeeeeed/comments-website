@@ -50,16 +50,25 @@ input, textarea {
   box-shadow: 0 0 4px #00f0ff; /* Less intense */
 }
 
-input[type="submit"] {
+button {
   background-color: #00f0ff;
   color: #0d0d0d;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 1rem;
   cursor: pointer;
-  transition: background 0.3s ease;
+  box-shadow: 0 0 6px #00f0ff, 0 0 12px #00f0ff inset;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
 
-input[type="submit"]:hover {
+button:hover {
   background-color: #00d4e0;
+  box-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff inset;
+  transform: scale(1.05);
 }
+
 
 .message {
   background-color: #1a1a1a;
@@ -171,5 +180,13 @@ if (!$result) {
       ?>
     </div>
   </div>
+  <div class="about-me">
+  <img src="me.jpg" alt="Picture of Me" class="profile-pic">
+  <div class="about-text">
+    <h2>Me</h2>
+    <p>Hallo. I learnt how to backend and database for dis. Was it worth the time and effort? Prob not. </p>
+  </div>
+</div>
+
 </body>
 </html>
