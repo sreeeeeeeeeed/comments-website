@@ -1,8 +1,9 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = ""; // default for XAMPP
-$dbname = "databaseforcomments";
+// Database connection setup
+$servername = getenv("DB_HOST");
+$username = getenv("DB_USER");
+$password = getenv("DB_PASSWORD");
+$dbname   = getenv("DB_NAME");
 
 // Connect to MySQL
 $conn = new mysqli($servername, $username, $password, $dbname);
