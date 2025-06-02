@@ -21,7 +21,14 @@ $message = $_POST['message'];
 // Insert into database
 $sql = "INSERT INTO messages (name, email, message) VALUES ('$name', '$email', '$message')";
 
+if ($conn->query($sql) === TRUE) {
+  // ✅ Redirect only if successful
+  header("Location: index.php");
+  exit();
+} else {
+  // ❌ Only show error if something fails (you could also log it instead)
+  echo "Error: " . $sql . "<br>" . $conn->error;
+}
+
 $conn->close();
-header("Location: index.php");
-exit();
 ?>
