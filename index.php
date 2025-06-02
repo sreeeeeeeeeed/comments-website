@@ -30,12 +30,21 @@ h1 {
 }
 
 form {
-  background-color: #111;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 6px #00f0ff; /* Softer glow */
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
 }
+
+input[type="text"],
+input[type="email"],
+textarea,
+input[type="submit"] {
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+}
+
 
 input, textarea {
   background-color: #1a1a1a;
