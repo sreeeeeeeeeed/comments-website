@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Kah Yang's personal comments page</title>
+  <link rel="icon" href="favicon.png" type="https://static.vecteezy.com/system/resources/previews/018/741/758/original/comment-box-3d-icon-png.png">
 
   <!-- Google Font: Orbitron for techno vibe -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
