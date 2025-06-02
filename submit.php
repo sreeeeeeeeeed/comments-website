@@ -21,12 +21,6 @@ $message = $_POST['message'];
 // Insert into database
 $sql = "INSERT INTO messages (name, email, message) VALUES ('$name', '$email', '$message')";
 
-if ($conn->query($sql) === TRUE) {
-  echo "Message posted successfully!";
-} else {
-  echo "Error: " . $sql . "<br>" . $conn->error;
-}
-
 $conn->close();
 header("Location: index.php");
 exit();
