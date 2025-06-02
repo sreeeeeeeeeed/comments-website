@@ -235,8 +235,8 @@ if (!$result) {
   <div class="about-me">
   <img src="tmp_ed06b594-533b-4b2e-b8a2-325460be1b00.jpeg" alt="Picture of Me" class="profile-pic">
   <div class="about-text">
-    <h2>Me</h2>
-    <p>Hallo! I learnt how to backend and database to make this. Was it worth the time and effort? Probably not. Is it cool though? Kinda </p>
+    <h2>About this site:</h2>
+    <p>Hallo! I learnt the art of backend'ing and database'ing to make this. Was it worth the time and effort? Probably not. Is it cool though? Ye </p>
   </div>
 </div>
 
