@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Techno Guestbook</title>
+  <title>Kah Yang's personal comments page</title>
 
   <!-- Google Font: Orbitron for techno vibe -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
@@ -14,144 +14,80 @@
       box-sizing: border-box;
     }
     body {
-      margin: 0;
-      background: #0a0f22;
-      color: #00ffea;
-      font-family: 'Orbitron', sans-serif;
-      display: flex;
-      justify-content: center;
-      padding: 2rem;
-      min-height: 100vh;
-      flex-direction: column;
-      align-items: center;
-      user-select: none;
-    }
-    h1 {
-      font-weight: 900;
-      font-size: 3rem;
-      margin-bottom: 1rem;
-      text-shadow:
-        0 0 5px #00ffea,
-        0 0 10px #00ffea,
-        0 0 20px #00ffea;
-    }
+  background-color: #0d0d0d;
+  color: #00f0ff;
+  font-family: 'Orbitron', sans-serif;
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+}
 
-    /* Container */
-    .container {
-      background: #111828;
-      padding: 2rem;
-      border-radius: 15px;
-      box-shadow:
-        0 0 15px #00ffea,
-        inset 0 0 30px #00ffc8;
-      max-width: 600px;
-      width: 100%;
-    }
+h1 {
+  font-size: 3rem;
+  color: #00f0ff;
+  text-shadow: 0 0 4px #00f0ff; /* Reduced glow */
+  margin-bottom: 30px;
+}
 
-    /* Form styling */
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-    input, textarea {
-      background: #0a0f22;
-      border: 2px solid #00ffea;
-      border-radius: 8px;
-      color: #00ffea;
-      font-size: 1.1rem;
-      padding: 0.8rem 1rem;
-      transition: border-color 0.3s ease;
-      font-family: 'Orbitron', monospace;
-    }
-    input::placeholder,
-    textarea::placeholder {
-      color: #00ffeaaa;
-    }
-    input:focus, textarea:focus {
-      border-color: #00ffc8;
-      outline: none;
-      box-shadow: 0 0 10px #00ffc8;
-    }
+form {
+  background-color: #111;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 6px #00f0ff; /* Softer glow */
+  display: inline-block;
+}
 
-    button {
-      background: #00ffea;
-      border: none;
-      padding: 1rem;
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: #0a0f22;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-      font-family: 'Orbitron', monospace;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      box-shadow:
-        0 0 15px #00ffea,
-        0 0 30px #00ffc8;
-    }
-    button:hover {
-      background: #00ffc8;
-      box-shadow:
-        0 0 25px #00ffc8,
-        0 0 40px #00ffea;
-    }
+input, textarea {
+  background-color: #1a1a1a;
+  border: 1px solid #00f0ff;
+  color: #00f0ff;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 10px 0;
+  width: 100%;
+  max-width: 400px;
+  font-family: inherit;
+  box-shadow: 0 0 4px #00f0ff; /* Less intense */
+}
 
-    /* Message list */
-    .message-list {
-      max-height: 300px;
-      overflow-y: auto;
-      border-top: 2px solid #00ffea;
-      padding-top: 1rem;
-      font-size: 1.1rem;
-      font-family: 'Orbitron', monospace;
-    }
+input[type="submit"] {
+  background-color: #00f0ff;
+  color: #0d0d0d;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
 
-    .message {
-      padding: 0.8rem 0;
-      border-bottom: 1px solid #004d40;
-      color: #00ffc8;
-      text-shadow: 0 0 3px #00ffea44;
-    }
+input[type="submit"]:hover {
+  background-color: #00d4e0;
+}
 
-    .message:last-child {
-      border-bottom: none;
-    }
+.message {
+  background-color: #1a1a1a;
+  border-left: 4px solid #00f0ff;
+  margin: 20px auto;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 0 5px #00f0ff; /* Reduced */
+  max-width: 500px;
+  text-align: left;
+}
 
-    .message .name {
-      font-weight: 900;
-      font-size: 1.2rem;
-      color: #00ffe1;
-      text-shadow:
-        0 0 3px #00ffe1,
-        0 0 7px #00ffe1;
-    }
+.name {
+  font-weight: bold;
+  color: #00f0ff;
+}
 
-    .message .posted_on {
-      font-size: 0.8rem;
-      color: #00695c;
-      margin-bottom: 0.3rem;
-      font-style: italic;
-    }
+.posted_on {
+  font-size: 0.9em;
+  color: #88ddee;
+  margin-bottom: 8px;
+}
 
-    .message .content {
-      white-space: pre-wrap;
-      color: #00ffd8cc;
-    }
+.content {
+  color: #e0faff;
+  line-height: 1.5;
+}
 
-    /* Scrollbar styling */
-    .message-list::-webkit-scrollbar {
-      width: 8px;
-    }
-    .message-list::-webkit-scrollbar-track {
-      background: #0a0f22;
-    }
-    .message-list::-webkit-scrollbar-thumb {
-      background: #00ffea99;
-      border-radius: 4px;
-    }
   </style>
 
   <script>
@@ -162,21 +98,21 @@
       var message = form["message"].value.trim();
 
       if (!name) {
-        alert("Please enter your Name!");
+        alert("Blud. Enter your name");
         return false;
       }
       if (!email) {
-        alert("Please enter your Email!");
+        alert("Email so I can trace you hehe");
         return false;
       }
       if (!message) {
-        alert("Please enter your Message!");
+        alert("Seriously? No message?");
         return false;
       }
       var atpos = email.indexOf("@");
       var dotpos = email.lastIndexOf(".");
       if (atpos < 1 || dotpos < atpos + 2 || dotpos + 2 >= email.length) {
-        alert("Not a valid e-mail address");
+        alert("Thats a fake email address1!!!!1! Or if you're trying to SQL inject, i've already safeguarded against that.");
         return false;
       }
       return true;
@@ -184,7 +120,7 @@
   </script>
 </head>
 <body>
-  <h1>Techno Guestbook</h1>
+  <h1>Kah Yang's personal comments page</h1>
 
   <div class="container">
     <form name="guest" method="POST" action="submit.php" onsubmit="return Validate()">
@@ -195,6 +131,31 @@
     </form>
 
     <div class="message-list">
+      <?php
+$servername = getenv("DB_HOST");
+$username = getenv("DB_USER");
+$password = getenv("DB_PASSWORD");
+$dbname = getenv("DB_NAME");
+
+
+// Connect to database
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Run the query
+$sql = "SELECT name, message, posted_on FROM messages ORDER BY posted_on DESC";
+$result = $conn->query($sql);
+
+// Check for query error
+if (!$result) {
+    die("Query failed: " . $conn->error);
+}
+?>
+
       <?php
       // Assume $conn is your mysqli connection and you've queried messages
       // Example:
