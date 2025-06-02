@@ -31,6 +31,40 @@ body::before {
   background-color: rgba(0, 0, 0, 0.6); /* 60% black overlay to dim */
   z-index: -1;
 }
+.about-me {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-top: 50px;
+  gap: 20px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.05); /* faint background for visibility */
+  border-radius: 12px;
+}
+
+.profile-pic {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.4); /* techno glow */
+}
+
+.about-text h2 {
+  font-size: 1.8rem;
+  color: cyan;
+  margin-bottom: 10px;
+}
+
+.about-text p {
+  font-size: 1rem;
+  color: white;
+  line-height: 1.6;
+}
 
 h1 {
   text-align: center;
@@ -199,7 +233,7 @@ if (!$result) {
     </div>
   </div>
   <div class="about-me">
-  <img src="me.jpg" alt="Picture of Me" class="profile-pic">
+  <img src="tmp_ed06b594-533b-4b2e-b8a2-325460be1b00.jpeg" alt="Picture of Me" class="profile-pic">
   <div class="about-text">
     <h2>Me</h2>
     <p>Hallo! I learnt how to backend and database to make this. Was it worth the time and effort? Probably not. Is it cool though? Kinda </p>
