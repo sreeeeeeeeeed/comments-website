@@ -14,12 +14,14 @@
       box-sizing: border-box;
     }
     body {
-  background-color: #0d0d0d;
-  color: #00f0ff;
-  font-family: 'Orbitron', sans-serif;
+background-image: url('https://www.bing.com/images/search?view=detailV2&ccid=y0YJL6av&id=4D0EF7593CF420853F62F167A633163435EFB775&thid=OIP.y0YJL6avWeAKQkMmXCnX4QHaE8&mediaurl=https%3A%2F%2Fimages.freeimages.com%2Fimages%2Flarge-previews%2F01a%2Ftechnology-background-1632715.jpg&exph=1068&expw=1600&q=tech+background&simid=608050388194101068&FORM=IRPRST&ck=B4A90B8FA80D4590490B63D084851C93&selectedIndex=4&itb=0&cw=941&ch=755&ajaxhist=0&ajaxserp=0');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: #e0faff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
-  padding: 20px;
-  text-align: center;
+  padding: 0;
 }
 
 h1 {
@@ -193,7 +195,7 @@ if (!$result) {
   <img src="me.jpg" alt="Picture of Me" class="profile-pic">
   <div class="about-text">
     <h2>Me</h2>
-    <p>Hallo. I learnt how to backend and database for dis. Was it worth the time and effort? Prob not. </p>
+    <p>Hallo! I learnt how to backend and database to make this. Was it worth the time and effort? Probably not. Is it cool though? Kinda </p>
   </div>
 </div>
 
