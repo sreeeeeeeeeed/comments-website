@@ -396,7 +396,7 @@ if (!$result) {
   }
 
   // ─── 5) If we showed only 15 but there are more, print “Read More” ───────────
-  if (! $showAll && isset($totalCount) && $totalCount > 2) {
+  if (! $showAll && isset($totalCount) && $totalCount > 15) {
     echo '<div style="text-align:center; margin-top:15px;">';
       echo '<a href="index.php?show_all=1" style="
         color:#00f0ff;
@@ -404,7 +404,7 @@ if (!$result) {
         font-family:Orbitron, sans-serif;
         font-weight:bold;
       ">';
-        echo 'Read More (' . ($totalCount - 2) . ' more)';
+        echo 'Read More (' . ($totalCount - 15) . ' more)';
       echo '</a>';
     echo '</div>';
   }
