@@ -1,3 +1,61 @@
+<?php
+// ─── 2A) CONNECT TO THE DATABASE ──────────────────────────────────────────
+$servername = getenv("DB_HOST");      // e.g. "sql12.freesqldatabase.com"
+$username   = getenv("DB_USER");      // e.g. "sql12782613"
+$password   = getenv("DB_PASSWORD");  // whatever you set
+$dbname     = getenv("DB_NAME");      // e.g. "sql12782613"
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+if ($conn->connect_error) {
+  die("DB Connection failed: " . $conn->connect_error);
+}
+
+// ─── 2B) LOG TODAY’S VISIT ──────────────────────────────────────────────────
+// Get today’s date in "YYYY-MM-DD" format
+$today = date('Y-m-d');
+
+// Insert a new row for today with count=1, or increment if already exists
+$sqlInsert = "
+  INSERT INTO visitors (visit_date, count)
+  VALUES (?, 1)
+  ON DUPLICATE KEY UPDATE count = count + 1
+";
+$stmt = $conn->prepare($sqlInsert);
+$stmt->bind_param("s", $today);
+$stmt->execute();
+$stmt->close();
+
+// ─── 2C) PREPARE LAST 7 DAYS FOR CHART ────────────────────────────────────
+// Build an array of the last 7 dates (from 6 days ago to today)
+$dates = [];
+for ($i = 6; $i >= 0; $i--) {
+    $dates[] = date('Y-m-d', strtotime("-{$i} days"));
+}
+
+// Initialize a PHP array mapping each date to a default count of 0
+$counts = array_fill_keys($dates, 0);
+
+// Fetch counts for these dates from the DB
+// We’ll run a single query with WHERE visit_date IN ('2025-05-28', '2025-05-29', …)
+$inClause = "'" . implode("','", $dates) . "'";
+$sqlQuery = "
+  SELECT visit_date, count
+  FROM visitors
+  WHERE visit_date IN ($inClause)
+";
+$result = $conn->query($sqlQuery);
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $counts[$row['visit_date']] = (int)$row['count'];
+    }
+}
+$conn->close();
+
+// Convert PHP arrays to JSON for JavaScript
+$labelsJSON = json_encode(array_values($dates));   // e.g. ["2025-05-28","2025-05-29",…]
+$dataJSON   = json_encode(array_values($counts));  // e.g. [12, 8, 15, …]
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,6 +63,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Kah Yang's personal comments page</title>
   <link rel="icon" href="favicon.png" type="https://static.vecteezy.com/system/resources/previews/018/741/758/original/comment-box-3d-icon-png.png">
+  <!-- Chart.js CDN for bar chart -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Google Font: Orbitron for techno vibe -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
@@ -183,6 +243,62 @@ button:hover {
 </head>
 <body>
   <h1>Kah Yang's personal comments page</h1>
+    <h2 style="text-align:center; color:#00f0ff; margin-bottom:10px;">
+  Visitors in the Last 7 Days
+</h2>
+<div style="max-width:700px; margin: auto; background:#111; padding:15px; border-radius:8px; box-shadow:0 0 6px #00f0ff;">
+  <canvas id="visitorsChart">  </canvas>
+</div>
+<script>
+  // 3A) Grab the PHP-generated JSON arrays
+  const labels = <?php echo $labelsJSON; ?>;   // e.g. ["2025-05-28","2025-05-29", …]
+  const data   = <?php echo $dataJSON; ?>;     // e.g. [12, 8, 15, …]
+
+  // 3B) Create the bar chart
+  const ctx = document.getElementById('visitorsChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Visitors',
+        data: data,
+        backgroundColor: 'rgba(0, 255, 255, 0.6)',
+        borderColor: 'rgba(0, 255, 255, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: {
+          ticks: {
+            color: '#00f0ff'
+          },
+          grid: {
+            color: '#004d40'
+          }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: '#00f0ff'
+          },
+          grid: {
+            color: '#004d40'
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          labels: {
+            color: '#00f0ff'
+          }
+        }
+      }
+    }
+  });
+</script>
 
   <div class="container">
     <form name="guest" method="POST" action="submit.php" onsubmit="return Validate()">
@@ -237,7 +353,7 @@ if (!$result) {
   <img src="tmp_ed06b594-533b-4b2e-b8a2-325460be1b00.jpeg" alt="Picture of Me" class="profile-pic">
   <div class="about-text">
     <h2>About this site:</h2>
-    <p>Hallo! I learnt the art of backend'ing and database'ing to make this. Was it worth the time and effort? Probably not. Is it cool though? Ye </p>
+    <p>Hello! No SQL inject or DDoS pls. Thanks :D. </p>
   </div>
 </div>
 
