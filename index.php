@@ -281,9 +281,10 @@ button:hover {
         },
         y: {
           beginAtZero: true,
-          ticks: {
-            color: '#00f0ff'
-          },
+           ticks: {
+          color: '#00f0ff',
+          stepSize: 1    // ← force increments of 1 (no decimals)
+        },
           grid: {
             color: '#004d40'
           }
@@ -353,7 +354,7 @@ if (!$result) {
   <img src="tmp_ed06b594-533b-4b2e-b8a2-325460be1b00.jpeg" alt="Picture of Me" class="profile-pic">
   <div class="about-text">
     <h2>About this site:</h2>
-    <p>Hello! No SQL inject or DDoS pls. Thanks :D. </p>
+    <p>Hello! I made this site for fun. No SQL inject or DDoS pls, I don't have the time (or expertise) to defend against them. Thanks and enjoy :D. </p>
   </div>
 </div>
 
