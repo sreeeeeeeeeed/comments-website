@@ -328,14 +328,14 @@ button:hover {
       labels: labels,
       datasets: [
         {
-          label: 'Total Visitors',
+          label: 'Total Visits',
           data: totalData,
           backgroundColor: 'rgba(0, 255, 255, 0.6)',
           borderColor: 'rgba(0, 255, 255, 1)',
           borderWidth: 1
         },
         {
-          label: 'Unique Visitors',
+          label: 'Unique Visitors (IP)',
           data: uniqueData,
           backgroundColor: 'rgba(200, 0, 0, 0.6)',
           borderColor: 'rgb(200, 0, 0)',

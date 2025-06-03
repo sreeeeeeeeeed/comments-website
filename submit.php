@@ -13,38 +13,48 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-// Get form data
-$name = $_POST['name'];
-$email = $_POST['email'];
-$message = $_POST['message'];
+// Get form data, sanitize inputs (basic)
+$name = $conn->real_escape_string($_POST['name']);
+$email = $conn->real_escape_string($_POST['email']);
+$message = $conn->real_escape_string($_POST['message']);
 
 // Insert into database
 $sql = "INSERT INTO messages (name, email, message) VALUES ('$name', '$email', '$message')";
 
 if ($conn->query($sql) === TRUE) {
-  $to      = $email;
-    $subject = "Thanks for posting on our website";
-    $body    = "Hi " . $name . ",\n\n"
-             . "Thank you for leaving a comment on our site. We appreciate your feedback:\n\n"
-             . "\"". $message . "\"\n\n"
-             . "— The KAH YANG Team (totally not just 1 person)\n"
-             . "https://comments-website.onrender.com\n";
-    // Additional headers
-    $headers = "From: no-reply@yourdomain.com\r\n"
-             . "Reply-To: no-reply@yourdomain.com\r\n"
-             . "X-Mailer: PHP/" . phpversion();
+    // Send confirmation email via Mailgun API
 
-    // Send the email
-    @mail($to, $subject, $body, $headers);
-    // (Suppress errors with @mail; you can remove @ to see warnings.)
+    $mgDomain = "sandbox0c8fa087907b4101a47ebfafb554de33.mailgun.org/settings?tab=setup";  // e.g. sandboxXXX.mailgun.org or your own domain
+    $mgApiKey = "94d198085b35d407624dc0632c9e9469-08c79601-575bd6ef
+"; // your private API key
 
-    // ───────────────────────────────────────────────────────────────────
-    // 3) Redirect back to index.php (no output before this header)
-    // ───────────────────────────────────────────────────────────────────
+    $postData = [
+        'from' => 'KAH YANG Team <teoky2020@gmail.com>',
+        'to' => $email,
+        'subject' => 'Thanks for posting on our website',
+        'text' => "Hi $name,\n\nThank you for leaving a comment on our site. We appreciate your feedback:\n\n\"$message\"\n\n— The KAH YANG Team\nhttps://comments-website.onrender.com"
+    ];
+
+    $ch = curl_init();
+
+    curl_setopt($ch, CURLOPT_URL, "https://api.mailgun.net/v3/$mgDomain/messages");
+    curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+    curl_setopt($ch, CURLOPT_USERPWD, 'api:' . $mgApiKey);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+
+    $result = curl_exec($ch);
+    if(curl_errno($ch)) {
+        error_log('Mailgun cURL error: ' . curl_error($ch));
+    }
+    curl_close($ch);
+
+    // Redirect back to index.php
     header("Location: index.php");
     exit();
+
 } else {
-  // ❌ Only show error if something fails (you could also log it instead)
   echo "Error: " . $sql . "<br>" . $conn->error;
 }
 
