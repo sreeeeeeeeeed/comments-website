@@ -12,19 +12,18 @@ if ($conn->connect_error) {
 
 // ─── 2B) LOG TODAY’S VISIT ──────────────────────────────────────────────────
 // Get today’s date in "YYYY-MM-DD" format
-$today = date('Y-m-d');
-
-// Insert a new row for today with count=1, or increment if already exists
-$sqlInsert = "
-  INSERT INTO visitors (visit_date, count)
-  VALUES (?, 1)
-  ON DUPLICATE KEY UPDATE count = count + 1
-";
-$stmt = $conn->prepare($sqlInsert);
-$stmt->bind_param("s", $today);
-$stmt->execute();
-$stmt->close();
-
+if (! isset($_GET['keepalive'])) {
+    $today = date('Y-m-d');
+    $sqlInsert = "
+      INSERT INTO visitors (visit_date, count)
+      VALUES (?, 1)
+      ON DUPLICATE KEY UPDATE count = count + 1
+    ";
+    $stmt = $conn->prepare($sqlInsert);
+    $stmt->bind_param("s", $today);
+    $stmt->execute();
+    $stmt->close();
+}
 // ─── 2C) PREPARE LAST 7 DAYS FOR CHART ────────────────────────────────────
 // Build an array of the last 7 dates (from 6 days ago to today)
 $dates = [];
