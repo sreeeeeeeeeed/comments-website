@@ -1,59 +1,106 @@
 <?php
-// ─── 2A) CONNECT TO THE DATABASE ──────────────────────────────────────────
-$servername = getenv("DB_HOST");      // e.g. "sql12.freesqldatabase.com"
-$username   = getenv("DB_USER");      // e.g. "sql12782613"
-$password   = getenv("DB_PASSWORD");  // whatever you set
-$dbname     = getenv("DB_NAME");      // e.g. "sql12782613"
+// ──────────────────────────────────────────────────────────────────────────────
+// 2A) CONNECT TO DATABASE (reuse your existing env‐var logic)
+// ──────────────────────────────────────────────────────────────────────────────
+$servername = getenv("DB_HOST");
+$username   = getenv("DB_USER");
+$password   = getenv("DB_PASSWORD");
+$dbname     = getenv("DB_NAME");
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
   die("DB Connection failed: " . $conn->connect_error);
 }
 
-// ─── 2B) LOG TODAY’S VISIT ──────────────────────────────────────────────────
-// Get today’s date in "YYYY-MM-DD" format
-if (! isset($_GET['keepalive'])) {
-    $today = date('Y-m-d');
-    $sqlInsert = "
-      INSERT INTO visitors (visit_date, count)
-      VALUES (?, 1)
-      ON DUPLICATE KEY UPDATE count = count + 1
-    ";
-    $stmt = $conn->prepare($sqlInsert);
-    $stmt->bind_param("s", $today);
-    $stmt->execute();
-    $stmt->close();
+// ──────────────────────────────────────────────────────────────────────────────
+// 2B) LOG TOTAL DAILY VISIT (same as before)
+// ──────────────────────────────────────────────────────────────────────────────
+$today = date('Y-m-d');
+$sqlTotal = "
+  INSERT INTO visitors (visit_date, count)
+  VALUES (?, 1)
+  ON DUPLICATE KEY UPDATE count = count + 1
+";
+$stmtTotal = $conn->prepare($sqlTotal);
+$stmtTotal->bind_param("s", $today);
+$stmtTotal->execute();
+$stmtTotal->close();
+
+// ──────────────────────────────────────────────────────────────────────────────
+// 2C) LOG UNIQUE DAILY VISIT IN visit_log
+// ──────────────────────────────────────────────────────────────────────────────
+// Get client IP (account for common proxies)
+function getClientIP() {
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        return $_SERVER['HTTP_CLIENT_IP'];
+    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        // May contain a comma‐separated list; take the first
+        $parts = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+        return trim($parts[0]);
+    } else {
+        return $_SERVER['REMOTE_ADDR'];
+    }
 }
-// ─── 2C) PREPARE LAST 7 DAYS FOR CHART ────────────────────────────────────
-// Build an array of the last 7 dates (from 6 days ago to today)
+
+$ip = getClientIP();
+$sqlUnique = "
+  INSERT IGNORE INTO visit_log (visit_date, ip_address)
+  VALUES (?, ?)
+";
+$stmtUnique = $conn->prepare($sqlUnique);
+$stmtUnique->bind_param("ss", $today, $ip);
+$stmtUnique->execute();
+$stmtUnique->close();
+
+// ──────────────────────────────────────────────────────────────────────────────
+// 2D) FETCH LAST 7 DAYS (TOTAL & UNIQUE) FOR CHART
+// ──────────────────────────────────────────────────────────────────────────────
+// Build PHP arrays of the last 7 dates
 $dates = [];
 for ($i = 6; $i >= 0; $i--) {
     $dates[] = date('Y-m-d', strtotime("-{$i} days"));
 }
 
-// Initialize a PHP array mapping each date to a default count of 0
-$counts = array_fill_keys($dates, 0);
+// Initialize PHP arrays with default 0 for total and unique
+$totalCounts  = array_fill_keys($dates, 0);
+$uniqueCounts = array_fill_keys($dates, 0);
 
-// Fetch counts for these dates from the DB
-// We’ll run a single query with WHERE visit_date IN ('2025-05-28', '2025-05-29', …)
+// 2D-1) Query TOTAL counts (same as before)
 $inClause = "'" . implode("','", $dates) . "'";
-$sqlQuery = "
+$sqlTotalQuery = "
   SELECT visit_date, count
   FROM visitors
   WHERE visit_date IN ($inClause)
 ";
-$result = $conn->query($sqlQuery);
-if ($result) {
-    while ($row = $result->fetch_assoc()) {
-        $counts[$row['visit_date']] = (int)$row['count'];
+$resTotal = $conn->query($sqlTotalQuery);
+if ($resTotal) {
+    while ($row = $resTotal->fetch_assoc()) {
+        $totalCounts[$row['visit_date']] = (int)$row['count'];
     }
 }
+
+// 2D-2) Query UNIQUE counts (count distinct IPs per day)
+$sqlUniqueQuery = "
+  SELECT visit_date, COUNT(*) AS unique_count
+  FROM visit_log
+  WHERE visit_date IN ($inClause)
+  GROUP BY visit_date
+";
+$resUnique = $conn->query($sqlUniqueQuery);
+if ($resUnique) {
+    while ($row = $resUnique->fetch_assoc()) {
+        $uniqueCounts[$row['visit_date']] = (int)$row['unique_count'];
+    }
+}
+
 $conn->close();
 
-// Convert PHP arrays to JSON for JavaScript
-$labelsJSON = json_encode(array_values($dates));   // e.g. ["2025-05-28","2025-05-29",…]
-$dataJSON   = json_encode(array_values($counts));  // e.g. [12, 8, 15, …]
+// Convert both PHP arrays to JSON for Chart.js
+$labelsJSON      = json_encode(array_values($dates));        // e.g. ["2025-05-28",…]
+$dataTotalJSON   = json_encode(array_values($totalCounts));   // e.g. [100, 85, 92, …]
+$dataUniqueJSON  = json_encode(array_values($uniqueCounts));  // e.g. [80, 70, 75, …]
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -262,26 +309,39 @@ button:hover {
   Visitors in the Last 7 Days
 </h2>
 <div style="max-width:700px; margin: auto; background:#111; padding:15px; border-radius:8px; box-shadow:0 0 6px #00f0ff;">
-  <canvas id="visitorsChart">  </canvas>
+ <div class="chart-container">
+  <h2>Visitors in the Last 7 Days</h2>
+  <canvas id="visitorsChart"></canvas>
 </div>
-<script>
-  // 3A) Grab the PHP-generated JSON arrays
-  const labels = <?php echo $labelsJSON; ?>;   // e.g. ["2025-05-28","2025-05-29", …]
-  const data   = <?php echo $dataJSON; ?>;     // e.g. [12, 8, 15, …]
 
-  // 3B) Create the bar chart
+<script>
+  // 3A) Grab PHP‐generated JSON arrays
+  const labels       = <?php echo $labelsJSON; ?>;      // ["2025-05-28", …]
+  const totalData    = <?php echo $dataTotalJSON; ?>;   // [100, 85, 92, …]
+  const uniqueData   = <?php echo $dataUniqueJSON; ?>;  // [80, 70, 75, …]
+
+  // 3B) Render Chart.js Bar Chart with two datasets
   const ctx = document.getElementById('visitorsChart').getContext('2d');
   new Chart(ctx, {
     type: 'bar',
     data: {
       labels: labels,
-      datasets: [{
-        label: 'Visitors',
-        data: data,
-        backgroundColor: 'rgba(0, 255, 255, 0.6)',
-        borderColor: 'rgba(0, 255, 255, 1)',
-        borderWidth: 1
-      }]
+      datasets: [
+        {
+          label: 'Total Visitors',
+          data: totalData,
+          backgroundColor: 'rgba(0, 255, 255, 0.6)',
+          borderColor: 'rgba(0, 255, 255, 1)',
+          borderWidth: 1
+        },
+        {
+          label: 'Unique Visitors',
+          data: uniqueData,
+          backgroundColor: 'rgba(0, 200, 120, 0.6)',
+          borderColor: 'rgba(0, 200, 120, 1)',
+          borderWidth: 1
+        }
+      ]
     },
     options: {
       responsive: true,
@@ -296,10 +356,10 @@ button:hover {
         },
         y: {
           beginAtZero: true,
-           ticks: {
-          color: '#00f0ff',
-          stepSize: 1    // ← force increments of 1 (no decimals)
-        },
+          ticks: {
+            color: '#00f0ff',
+            stepSize: 1
+          },
           grid: {
             color: '#004d40'
           }
@@ -315,6 +375,7 @@ button:hover {
     }
   });
 </script>
+
   <h2 style="text-align:center; color:#00f0ff; margin-bottom:10px;">
 Post a comment:
 </h2>
