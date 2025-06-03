@@ -337,8 +337,8 @@ button:hover {
         {
           label: 'Unique Visitors',
           data: uniqueData,
-          backgroundColor: 'rgba(0, 200, 120, 0.6)',
-          borderColor: 'rgba(0, 200, 120, 1)',
+          backgroundColor: 'rgba(200, 0, 0, 0.6)',
+          borderColor: 'rgb(200, 0, 0)',
           borderWidth: 1
         }
       ]
