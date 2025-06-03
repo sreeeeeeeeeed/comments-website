@@ -105,6 +105,22 @@ body::before {
   background-color: rgba(255, 255, 255, 0.05); /* faint background for visibility */
   border-radius: 12px;
 }
+.read-more {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 8px 16px;
+  background: #00f0ff;
+  color: #0a0a0a;
+  border-radius: 6px;
+  text-decoration: none;
+  font-family: 'Orbitron', monospace;
+  font-weight: bold;
+  box-shadow: 0 0 6px #00f0ff, 0 0 12px #00f0ff inset;
+  transition: transform 0.2s ease;
+}
+.read-more:hover {
+  transform: scale(1.05);
+}
 
 .profile-pic {
   width: 150px;
@@ -233,7 +249,7 @@ button:hover {
       var atpos = email.indexOf("@");
       var dotpos = email.lastIndexOf(".");
       if (atpos < 1 || dotpos < atpos + 2 || dotpos + 2 >= email.length) {
-        alert("Thats a fake email address1!!!!1! Or if you're trying to SQL inject, i've already safeguarded against that.");
+        alert("Thats a fake email address1!!!!1!");
         return false;
       }
       return true;
@@ -299,7 +315,9 @@ button:hover {
     }
   });
 </script>
-
+  <h2 style="text-align:center; color:#00f0ff; margin-bottom:10px;">
+Post a comment:
+</h2>
   <div class="container">
     <form name="guest" method="POST" action="submit.php" onsubmit="return Validate()">
       <input type="text" name="name" placeholder="Your Name" required />
@@ -335,18 +353,63 @@ if (!$result) {
 ?>
 
       <?php
-      // Assume $conn is your mysqli connection and you've queried messages
-      // Example:
-      // $result = $conn->query("SELECT name, message, posted_on FROM messages ORDER BY posted_on DESC");
+  // ─── 1) Determine whether we should show all comments or just the first 15 ─────
+  $showAll = isset($_GET['show_all']) && $_GET['show_all'] === '1';
 
-      while ($row = $result->fetch_assoc()) {
-          echo '<div class="message">';
-          echo '<div class="name">' . htmlspecialchars($row['name']) . '</div>';
-          echo '<div class="posted_on">' . htmlspecialchars($row['posted_on']) . '</div>';
-          echo '<div class="content">' . nl2br(htmlspecialchars($row['message'])) . '</div>';
-          echo '</div>';
-      }
-      ?>
+  // ─── 2) If NOT showing all, get the total count and then limit to 15 ─────────
+  if (! $showAll) {
+    // 2A) Count how many comments exist
+    $countResult = $conn->query("SELECT COUNT(*) AS total FROM messages");
+    $totalRow    = $countResult->fetch_assoc();
+    $totalCount  = (int)$totalRow['total'];
+
+    // 2B) Fetch only the latest 15
+    $sql = "
+      SELECT name, message, posted_on
+      FROM messages
+      ORDER BY posted_on DESC
+      LIMIT 15
+    ";
+  }
+  else {
+    // ─── 3) If showing all, fetch every comment ───────────────────────────────
+    $sql = "
+      SELECT name, message, posted_on
+      FROM messages
+      ORDER BY posted_on DESC
+    ";
+  }
+
+  $res = $conn->query($sql);
+
+  // ─── 4) Loop through whichever rows we fetched and render them ───────────────
+  if ($res && $res->num_rows > 0) {
+    while ($row = $res->fetch_assoc()) {
+      echo '<div class="message">';
+        echo '<div class="name">'     . htmlspecialchars($row['name'])      . '</div>';
+        echo '<div class="posted_on">' . htmlspecialchars($row['posted_on']) . '</div>';
+        echo '<div class="content">'   . nl2br(htmlspecialchars($row['message'])) . '</div>';
+      echo '</div>';
+    }
+  } else {
+    echo "<p>No comments yet. Be the first to post!</p>";
+  }
+
+  // ─── 5) If we showed only 15 but there are more, print “Read More” ───────────
+  if (! $showAll && isset($totalCount) && $totalCount > 15) {
+    echo '<div style="text-align:center; margin-top:15px;">';
+      echo '<a href="index.php?show_all=1" style="
+        color:#00f0ff;
+        text-decoration:none;
+        font-family:Orbitron, sans-serif;
+        font-weight:bold;
+      ">';
+        echo 'Read More (' . ($totalCount - 15) . ' more)';
+      echo '</a>';
+    echo '</div>';
+  }
+?>
+
     </div>
   </div>
   <div class="about-me">
