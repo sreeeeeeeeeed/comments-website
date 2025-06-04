@@ -526,18 +526,46 @@ if (!$result) {
     <?php if (!isset($_GET['voted'])): ?>
       <!-- 4B) Show the voting form -->
       <form method="POST" action="vote.php">
-        <?php foreach ($options as $opt): ?>
-          <div style="margin-bottom:10px;">
-            <input type="radio" 
-                   name="option_id" 
-                   value="<?php echo $opt['id']; ?>" 
-                   id="opt<?php echo $opt['id']; ?>" 
-                   required>
-            <label for="opt<?php echo $opt['id']; ?>" style="margin-left:8px;">
-              <?php echo htmlspecialchars($opt['option_text']); ?>
-            </label>
-          </div>
-        <?php endforeach; ?>
+    <style>
+  .poll-option {
+    display: none;
+  }
+
+  .poll-label {
+    display: block;
+    padding: 12px 16px;
+    margin: 8px 0;
+    background-color: #0e0e0e;
+    border: 2px solid #00f0ff;
+    border-radius: 8px;
+    color: #e0faff;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    text-align: center;
+    transition: background 0.3s, transform 0.2s;
+  }
+
+  .poll-option:checked + .poll-label {
+    background-color: #00f0ff;
+    color: #0a0a0a;
+    font-weight: bold;
+    transform: scale(1.03);
+  }
+</style>
+
+<?php foreach ($options as $opt): ?>
+  <input type="radio"
+         class="poll-option"
+         name="option_id"
+         value="<?php echo $opt['id']; ?>"
+         id="opt<?php echo $opt['id']; ?>"
+         required>
+  <label for="opt<?php echo $opt['id']; ?>" class="poll-label">
+    <?php echo htmlspecialchars($opt['option_text']); ?>
+  </label>
+<?php endforeach; ?>
+
 
         <button type="submit" style="
           margin-top:15px;
