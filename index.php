@@ -427,7 +427,7 @@ Post a comment:
   <div class="container">
     <form name="guest" method="POST" action="submit.php" onsubmit="return Validate()">
       <input type="text" name="name" placeholder="Your Name" required />
-      <input type="email" name="email" placeholder="Your Email" required />
+      <input type="email" name="email" placeholder="Your Email (an email will be sent to you afterwards)" required />
       <textarea name="message" placeholder="Your Message" rows="5" required></textarea>
       <button type="submit">Post Comment</button>
     </form>
