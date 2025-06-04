@@ -49,7 +49,7 @@ if ($stmt->execute()) {
         $mail->Port       = (int)getenv('GMAIL_SMTP_PORT');  // 587
 
         // b) Recipients
-        $mail->setFrom(getenv('GMAIL_FROM_EMAIL'), getenv('GMAIL_FROM_NAME'));
+        $mail->setFrom("teoky2020@gmail.com", "Kah Yang Team");
         $mail->addAddress($email, $name);
 
         // c) Content
