@@ -1,61 +1,83 @@
 <?php
-// Database connection setup
+// Include PHPMailer manually (assuming you copied src/ into your project)
+require 'src/PHPMailer.php';
+require 'src/SMTP.php';
+require 'src/Exception.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+// ──────────────────────────────────────────────────────────────────────────────
+// 1) DATABASE CONNECTION
+// ──────────────────────────────────────────────────────────────────────────────
 $servername = getenv("DB_HOST");
-$username = getenv("DB_USER");
-$password = getenv("DB_PASSWORD");
-$dbname   = getenv("DB_NAME");
+$dbuser     = getenv("DB_USER");
+$dbpass     = getenv("DB_PASSWORD");
+$dbname     = getenv("DB_NAME");
 
-// Connect to MySQL
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
+$conn = new mysqli($servername, $dbuser, $dbpass, $dbname);
 if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
+    die("Connection failed: " . $conn->connect_error);
 }
 
-// Get form data, sanitize inputs (basic)
-$name = $conn->real_escape_string($_POST['name']);
-$email = $conn->real_escape_string($_POST['email']);
-$message = $conn->real_escape_string($_POST['message']);
+// ──────────────────────────────────────────────────────────────────────────────
+// 2) GET & SANITIZE FORM DATA
+// ──────────────────────────────────────────────────────────────────────────────
+$name    = $conn->real_escape_string($_POST['name']   ?? '');
+$email   = $conn->real_escape_string($_POST['email']  ?? '');
+$message = $conn->real_escape_string($_POST['message'] ?? '');
 
-// Insert into database
-$sql = "INSERT INTO messages (name, email, message) VALUES ('$name', '$email', '$message')";
+// ──────────────────────────────────────────────────────────────────────────────
+// 3) INSERT INTO messages TABLE
+// ──────────────────────────────────────────────────────────────────────────────
+$stmt = $conn->prepare("INSERT INTO messages (name, email, message) VALUES (?, ?, ?)");
+$stmt->bind_param("sss", $name, $email, $message);
 
-if ($conn->query($sql) === TRUE) {
-    // Send confirmation email via Mailgun API
+if ($stmt->execute()) {
+    // ──────────────────────────────────────────────────────────────────────────
+    // 4) SEND THANK-YOU EMAIL VIA GMAIL SMTP
+    // ──────────────────────────────────────────────────────────────────────────
+    $mail = new PHPMailer(true);
+    try {
+        // a) Server settings
+        $mail->isSMTP();
+        $mail->Host       = "smtp.gmail.com"
+        $mail->SMTPAuth   = true;
+        $mail->Username   = "teoky2020@gmail.com"
+        $mail->Password   = getenv('GMAIL_SMTP_PASS');       // the 16-char App Password
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;  // TLS
+        $mail->Port       = (int)getenv('GMAIL_SMTP_PORT');  // 587
 
-    $mgDomain = "sandbox0c8fa087907b4101a47ebfafb554de33.mailgun.org/settings?tab=setup";  // e.g. sandboxXXX.mailgun.org or your own domain
-    $mgApiKey = "f5c4bbf6ddc6224bdc12f1d46c608136-08c79601-d451062d"; // your private API key
+        // b) Recipients
+        $mail->setFrom(getenv('GMAIL_FROM_EMAIL'), getenv('GMAIL_FROM_NAME'));
+        $mail->addAddress($email, $name);
 
-    $postData = [
-        'from' => 'KAH YANG Team <teoky2020@gmail.com>',
-        'to' => $email,
-        'subject' => 'Thanks for posting on our website',
-        'text' => "Hi $name,\n\nThank you for leaving a comment on our site. We appreciate your feedback:\n\n\"$message\"\n\n— The KAH YANG Team\nhttps://comments-website.onrender.com"
-    ];
+        // c) Content
+        $mail->isHTML(false);
+        $mail->Subject = 'Thanks for posting on our website';
+        $mail->Body    =
+          "Hi $name,\n\n" .
+          "Thank you for leaving a comment on our site. We appreciate your feedback:\n\n" .
+          "\"$message\"\n\n" .
+          "— The KAH YANG Team\n" .
+          "https://comments-website.onrender.com";
 
-    $ch = curl_init();
-
-    curl_setopt($ch, CURLOPT_URL, "https://api.mailgun.net/v3/$mgDomain/messages");
-    curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-    curl_setopt($ch, CURLOPT_USERPWD, 'api:' . $mgApiKey);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-
-    $result = curl_exec($ch);
-    if(curl_errno($ch)) {
-        error_log('Mailgun cURL error: ' . curl_error($ch));
+        $mail->send();
+        // Email sent successfully
+    } catch (Exception $e) {
+        // Log error but do not interrupt user flow
+        error_log("Mailer Error: " . $mail->ErrorInfo);
     }
-    curl_close($ch);
 
-    // Redirect back to index.php
+    // ──────────────────────────────────────────────────────────────────────────
+    // 5) REDIRECT BACK TO index.php
+    // ──────────────────────────────────────────────────────────────────────────
     header("Location: index.php");
     exit();
-
 } else {
-  echo "Error: " . $sql . "<br>" . $conn->error;
+    echo "Error inserting comment: " . $stmt->error;
 }
 
+$stmt->close();
 $conn->close();
 ?>
