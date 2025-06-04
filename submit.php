@@ -54,12 +54,12 @@ if ($stmt->execute()) {
 
         // c) Content
         $mail->isHTML(false);
-        $mail->Subject = 'Thanks for posting on our website';
+        $mail->Subject = 'Thanks for posting on my website';
         $mail->Body    =
           "Hi $name,\n\n" .
-          "Thank you for leaving a comment on our site. We appreciate your feedback:\n\n" .
+          "Thank you comrade, for leaving a comment on our site. We appreciate your comtribution:\n\n" .
           "\"$message\"\n\n" .
-          "— The KAH YANG Team\n" .
+          "The KAH YANG Team\n" .
           "https://comments-website.onrender.com";
 
         $mail->send();
