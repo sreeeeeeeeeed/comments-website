@@ -23,17 +23,15 @@ if ($conn->connect_error) {
 // ──────────────────────────────────────────────────────────────────────────────
 // 2) GET & SANITIZE FORM DATA
 // ──────────────────────────────────────────────────────────────────────────────
-$name    = $conn->real_escape_string($_POST['name']   ?? '');
-$email   = $conn->real_escape_string($_POST['email']  ?? '');
-$message = $conn->real_escape_string($_POST['message'] ?? '');
+$name    = $_POST['name']   ?? '';
+$email   = $_POST['email']  ?? '';
+$message = $_POST['message'] ?? '';
 
-// ──────────────────────────────────────────────────────────────────────────────
-// 3) INSERT INTO messages TABLE
-// ──────────────────────────────────────────────────────────────────────────────
-$stmt = $conn->prepare("INSERT INTO messages (name, email, message) VALUES (?, ?, ?)");
-$stmt->bind_param("sss", $name, $email, $message);
+$sql = "INSERT INTO messages (name, email, message) VALUES ('$name', '$email', '$message')";
 
-if ($stmt->execute()) {
+if ($conn->query($sql) === TRUE) {
+    // Continue with mail + redirect...
+
     // ──────────────────────────────────────────────────────────────────────────
     // 4) SEND THANK-YOU EMAIL VIA GMAIL SMTP
     // ──────────────────────────────────────────────────────────────────────────
