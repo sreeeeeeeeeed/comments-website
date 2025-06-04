@@ -60,16 +60,18 @@ if ($conn->connect_error) {
 // ──────────────────────────────────────────────────────────────────────────────
 // 2B) LOG TOTAL DAILY VISIT (same as before)
 // ──────────────────────────────────────────────────────────────────────────────
-$today = date('Y-m-d');
-$sqlTotal = "
-  INSERT INTO visitors (visit_date, count)
-  VALUES (?, 1)
-  ON DUPLICATE KEY UPDATE count = count + 1
-";
-$stmtTotal = $conn->prepare($sqlTotal);
-$stmtTotal->bind_param("s", $today);
-$stmtTotal->execute();
-$stmtTotal->close();
+if (!isset($_GET['keepalive']) || $_GET['keepalive'] !== '1') {
+    $today = date('Y-m-d');
+    $sqlTotal = "
+      INSERT INTO visitors (visit_date, count)
+      VALUES (?, 1)
+      ON DUPLICATE KEY UPDATE count = count + 1
+    ";
+    $stmtTotal = $conn->prepare($sqlTotal);
+    $stmtTotal->bind_param("s", $today);
+    $stmtTotal->execute();
+    $stmtTotal->close();
+}
 
 // ──────────────────────────────────────────────────────────────────────────────
 // 2C) LOG UNIQUE DAILY VISIT IN visit_log
@@ -625,7 +627,7 @@ if (!$result) {
   <img src="tmp_ed06b594-533b-4b2e-b8a2-325460be1b00.jpeg" alt="Picture of Me" class="profile-pic">
   <div class="about-text">
     <h2>About this site:</h2>
-    <p>Hello! I made this site for fun. No SQL inject or DDoS pls, I don't have the time (or expertise) to defend against them. Thanks and enjoy :D. </p>
+    <p>Hello! I made this site for fun. No SQL inject pls, I didn't have time to defend against it. Thanks and enjoy the website 🚩</p>
   </div>
 </div>
 
