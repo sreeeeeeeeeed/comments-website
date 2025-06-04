@@ -310,10 +310,10 @@ button:hover {
 </h2>
 <div style="max-width:700px; margin: auto; background:#111; padding:15px; border-radius:8px; box-shadow:0 0 6px #00f0ff;">
  <div class="chart-container">
-  <h2>Visitors in the Last 7 Days</h2>
+  
   <canvas id="visitorsChart"></canvas>
 </div>
-
+</div>
 <script>
   // 3A) Grab PHP‐generated JSON arrays
   const labels       = <?php echo $labelsJSON; ?>;      // ["2025-05-28", …]
