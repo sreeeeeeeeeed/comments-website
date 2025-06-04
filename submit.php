@@ -41,9 +41,9 @@ if ($stmt->execute()) {
     try {
         // a) Server settings
         $mail->isSMTP();
-        $mail->Host       = "smtp.gmail.com"
+        $mail->Host       = "smtp.gmail.com";
         $mail->SMTPAuth   = true;
-        $mail->Username   = "teoky2020@gmail.com"
+        $mail->Username   = "teoky2020@gmail.com";
         $mail->Password   = getenv('GMAIL_SMTP_PASS');       // the 16-char App Password
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;  // TLS
         $mail->Port       = (int)getenv('GMAIL_SMTP_PORT');  // 587
