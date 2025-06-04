@@ -25,8 +25,7 @@ if ($conn->query($sql) === TRUE) {
     // Send confirmation email via Mailgun API
 
     $mgDomain = "sandbox0c8fa087907b4101a47ebfafb554de33.mailgun.org/settings?tab=setup";  // e.g. sandboxXXX.mailgun.org or your own domain
-    $mgApiKey = "94d198085b35d407624dc0632c9e9469-08c79601-575bd6ef
-"; // your private API key
+    $mgApiKey = "f5c4bbf6ddc6224bdc12f1d46c608136-08c79601-d451062d"; // your private API key
 
     $postData = [
         'from' => 'KAH YANG Team <teoky2020@gmail.com>',
