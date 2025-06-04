@@ -1,5 +1,50 @@
 <?php
 // ──────────────────────────────────────────────────────────────────────────────
+// 4A) Poll‐related setup at the very top of index.php (before any HTML output)
+// ──────────────────────────────────────────────────────────────────────────────
+$servername = getenv("DB_HOST");
+$dbuser     = getenv("DB_USER");
+$dbpass     = getenv("DB_PASSWORD");
+$dbname     = getenv("DB_NAME");
+
+$conn_p = new mysqli($servername, $dbuser, $dbpass, $dbname);
+if ($conn_p->connect_error) {
+    die("Connection failed: " . $conn_p->connect_error);
+}
+
+// Fetch the active poll (should be exactly one)
+$pollQ = $conn_p->query("SELECT id, question FROM poll WHERE active = 1 LIMIT 1");
+if ($pollQ && $pollQ->num_rows === 1) {
+    $poll = $pollQ->fetch_assoc();
+    $poll_id = (int)$poll['id'];
+    $question = $poll['question'];
+
+    // Fetch all options & their votes for this poll
+    $optStmt = $conn_p->prepare("SELECT id, option_text, votes FROM poll_option WHERE poll_id = ? ORDER BY id");
+    $optStmt->bind_param("i", $poll_id);
+    $optStmt->execute();
+    $optRes = $optStmt->get_result();
+
+    $options = [];
+    $totalVotes = 0;
+    while ($row = $optRes->fetch_assoc()) {
+        $options[] = $row;
+        $totalVotes += (int)$row['votes'];
+    }
+    $optStmt->close();
+} else {
+    // No active poll found
+    $poll_id = 0;
+    $options = [];
+    $question = "";
+    $totalVotes = 0;
+}
+
+$conn_p->close();
+?>
+
+<?php
+// ──────────────────────────────────────────────────────────────────────────────
 // 2A) CONNECT TO DATABASE (reuse your existing env‐var logic)
 // ──────────────────────────────────────────────────────────────────────────────
 $servername = getenv("DB_HOST");
@@ -473,6 +518,81 @@ if (!$result) {
 
     </div>
   </div>
+  <!-- ───── POLL SECTION ──────────────────────────────────────────────────────── -->
+<?php if ($poll_id > 0): ?>
+  <div class="poll-container" style="background:#111; padding:20px; margin:20px auto; max-width:600px; border-radius:8px; box-shadow:0 0 6px #00f0ff; color:#e0faff; font-family:'Orbitron', sans-serif;">
+    <h2 style="margin-bottom:15px; color:#00f0ff;"><?php echo htmlspecialchars($question); ?></h2>
+
+    <?php if (!isset($_GET['voted'])): ?>
+      <!-- 4B) Show the voting form -->
+      <form method="POST" action="vote.php">
+        <?php foreach ($options as $opt): ?>
+          <div style="margin-bottom:10px;">
+            <input type="radio" 
+                   name="option_id" 
+                   value="<?php echo $opt['id']; ?>" 
+                   id="opt<?php echo $opt['id']; ?>" 
+                   required>
+            <label for="opt<?php echo $opt['id']; ?>" style="margin-left:8px;">
+              <?php echo htmlspecialchars($opt['option_text']); ?>
+            </label>
+          </div>
+        <?php endforeach; ?>
+
+        <button type="submit" style="
+          margin-top:15px;
+          padding:10px 20px;
+          background:#00f0ff;
+          color:#0a0a0a;
+          border:none;
+          border-radius:6px;
+          font-family:'Orbitron', sans-serif;
+          font-weight:bold;
+          cursor:pointer;
+          box-shadow:0 0 6px #00f0ff, 0 0 12px #00f0ff inset;
+          transition:background 0.3s ease, transform 0.2s ease;
+        ">Vote</button>
+      </form>
+
+    <?php else: ?>
+      <!-- 4C) Show results if user just voted or saw results -->
+      <div style="margin-top:10px;">
+        <?php 
+        // Prevent division by zero
+        if ($totalVotes === 0) {
+          echo "<p>No votes yet.</p>";
+        } else {
+          foreach ($options as $opt):
+            $count = (int)$opt['votes'];
+            $percent = round(($count / max(1, $totalVotes)) * 100);
+        ?>
+            <div style="margin-bottom:12px;">
+              <div style="display:flex; justify-content:space-between; font-size:0.95rem;">
+                <span><?php echo htmlspecialchars($opt['option_text']); ?></span>
+                <span><?php echo $percent; ?>%</span>
+              </div>
+              <div style="background:#222; border-radius:4px; overflow:hidden; height:16px;">
+                <div style="
+                  width:<?php echo $percent; ?>%;
+                  background:#00ffc8;
+                  height:100%;
+                "></div>
+              </div>
+            </div>
+        <?php 
+          endforeach;
+        } 
+        ?>
+        <p style="margin-top:10px; font-size:0.9rem; color:#88ddee;">
+          Total votes: <?php echo $totalVotes; ?>
+        </p>
+      </div>
+    <?php endif; ?>
+
+  </div>
+<?php endif; ?>
+<!-- ────────────────────────────────────────────────────────────────────────────── -->
+
   <div class="about-me">
   <img src="tmp_ed06b594-533b-4b2e-b8a2-325460be1b00.jpeg" alt="Picture of Me" class="profile-pic">
   <div class="about-text">
