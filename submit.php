@@ -57,7 +57,7 @@ if ($stmt->execute()) {
         $mail->Subject = 'Thanks for posting on my website';
         $mail->Body    =
           "Hi $name,\n\n" .
-          "Thank you comrade, for leaving a comment on our site. We appreciate your comtribution:\n\n" .
+          "Thank you comrade, for leaving a comment on our site. We appreciate your contribution:\n\n" .
           "\"$message\"\n\n" .
           "The KAH YANG Team\n" .
           "https://comments-website.onrender.com";
