@@ -185,6 +185,67 @@ body::before {
   background-color: rgba(0, 0, 0, 0.6); /* 60% black overlay to dim */
   z-index: -1;
 }
+.techno-glow-box {
+  position: relative;
+  padding: 20px 30px;
+  background-color: #000;          /* starts black */
+  color: #e0e0e0;                  /* light text */
+  border-radius: 10px;
+  overflow: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  max-width: 300px;                /* adjust width as desired */
+  margin: 20px auto;               /* center horizontally if desired */
+  text-align: center;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.1rem;
+}
+
+/* On hover, fill interior with gold and switch text to black */
+.techno-glow-box:hover {
+  background-color: gold;
+  color: #000;
+}
+
+/* Pseudo-element that draws & animates the golden border */
+.techno-glow-box::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: conic-gradient(
+    from 0deg,
+    gold 0%, transparent 25%,
+    gold 50%, transparent 75%,
+    gold 100%
+  );
+  /* Mask out center so only a 4px-thick border shows */
+  -webkit-mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - 4px),
+    black calc(100% - 4px)
+  );
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - 4px),
+    black calc(100% - 4px)
+  );
+  animation: techno-spin 1.8s linear infinite;
+  pointer-events: none;  /* allow clicks through to the box */
+  z-index: 0;
+}
+
+/* Ensure the box text/content sits above the animated border */
+.techno-glow-box > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Keyframes to rotate the conic gradient around the border */
+@keyframes techno-spin {
+  to { transform: rotate(1turn); }
+}
 .about-me {
   display: flex;
   flex-direction: column;
@@ -622,6 +683,9 @@ if (!$result) {
   </div>
 <?php endif; ?>
 <!-- ────────────────────────────────────────────────────────────────────────────── -->
+<div class="techno-glow-box">
+  Successful flag{} finders: Jason, Brandon
+</div>
 
   <div class="about-me">
   <img src="tmp_ed06b594-533b-4b2e-b8a2-325460be1b00.jpeg" alt="Picture of Me" class="profile-pic">
