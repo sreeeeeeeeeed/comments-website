@@ -7,7 +7,7 @@ $dbuser     = getenv("DB_USER");
 $dbpass     = getenv("DB_PASSWORD");
 $dbname     = getenv("DB_NAME");
 mysqli_close(mysqli_connect());
-$conn_p = new mysqli($servername, $dbuser, $dbpass, $dbname);
+$conn_p = new mysqli($servername, $dbuser, $dbpass, $dbname,3306);
 if ($conn_p->connect_error) {
     die("Connection failed: " . $conn_p->connect_error);
 }
@@ -487,7 +487,7 @@ $dbname = getenv("DB_NAME");
 
 
 // Connect to database
-$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = new mysqli($servername, $username, $password, $dbname,3306);
 
 // Check connection
 if ($conn->connect_error) {
