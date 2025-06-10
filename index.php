@@ -188,41 +188,57 @@ body::before {
 /* ───── Techno‐Style Animated Glowing Border ───── */
 
 /* 1) Outer wrapper: holds the animated conic gradient */
-.techno-border {
-  display: inline-block;               /* shrink‐wrap to the content */
-  padding: 4px;                        /* this defines the border thickness */
-  border-radius: 10px;                 /* outer radius */
-  background: conic-gradient(
-    gold 0%, transparent 25%,
-    gold 50%, transparent 75%,
-    gold 100%
+.card {
+  max-width: 400px;
+  width: 100%;
+  margin: 50px auto;
+  border-radius: 8px;           /* your desired corner radius */
+}
+
+.card .inner {
+  padding: 25px;
+  background: #222;
+  color: #fff;
+  border-radius: 8px;           /* match card radius */
+}
+.example-1 {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;             /* clip the oversized pseudo-element */
+}
+
+.example-1 .inner {
+  position: relative;
+  z-index: 1;                   /* keep content above the pseudo-element */
+  width: 100%;
+  margin: 5px;                  /* thickness of the “fake” border */
+}
+
+/* Pseudo-element that provides the rotating gradient glow */
+.example-1::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  margin: -200px;               /* half of height/width to center it */
+  width: 500px;
+  height: 500px;                /* large enough to cover corners */
+  background: linear-gradient(
+    90deg,
+    hsla(197,100%,64%,1) 0%,
+    hsla(339,100%,55%,1) 100%
   );
-  animation: spin 1.8s linear infinite; /* rotate the gradient */
+  animation: rotate 8s linear infinite;
+  z-index: 0;
 }
 
-/* 2) Inner box: starts black; on hover turns gold */
-.techno-box {
-  background-color: #000;              /* initial: black */
-  color: #e0e0e0;                      /* light gray text */
-  padding: 20px 30px;                  /* adjust as needed */
-  border-radius: 6px;                  /* inner radius = outer (10px) – border (4px) */
-  text-align: center;
-  font-family: 'Orbitron', sans-serif;
-  font-size: 1.1rem;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  cursor: default;
+/* Keyframes to spin the gradient around the center */
+@keyframes rotate {
+  from   { transform: rotate(0deg);   }
+  to     { transform: rotate(360deg); }
 }
 
-/* 3) Hover state: fill interior with gold, text becomes black */
-.techno-border:hover .techno-box {
-  background-color: gold;
-  color: #000;
-}
-
-/* 4) Keyframes for rotating the conic gradient */
-@keyframes spin {
-  to { transform: rotate(1turn); }
-}
 
 .about-me {
   display: flex;
@@ -391,11 +407,13 @@ button:hover {
 </head>
 <body>
   <h1>Kah Yang's personal comments page</h1>
-  <div class="techno-border">
-  <div class="techno-box">
-    Update: The database I was previously using has expired and all the comments have been lost D: Don't worry though, this new database should last.
+<div class="card example-1">
+  <div class="inner">
+    <h3>Update:</h3>
+    <p>The database I was previously using has expired and all the comments have been lost D: Don't worry though, this new database should last.</p>
   </div>
 </div>
+
     <h2 style="text-align:center; color:#00f0ff; margin-bottom:10px;">
   Visitors in the Last 7 Days
 </h2>
@@ -666,9 +684,10 @@ if (!$result) {
   </div>
 <?php endif; ?>
 <!-- ────────────────────────────────────────────────────────────────────────────── -->
-<div class="techno-border">
-  <div class="techno-box">
-    Successful flag finders: Brandon, Jason
+<div class="card example-1">
+  <div class="inner">
+    <h3>Successful flag{} hunters:</h3>
+    <p>Jason, Brandon</p>
   </div>
 </div>
 
