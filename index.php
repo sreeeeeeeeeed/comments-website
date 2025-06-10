@@ -6,7 +6,7 @@ $servername = getenv("DB_HOST");
 $dbuser     = getenv("DB_USER");
 $dbpass     = getenv("DB_PASSWORD");
 $dbname     = getenv("DB_NAME");
-
+mysqli_close(mysqli_connect());
 $conn_p = new mysqli($servername, $dbuser, $dbpass, $dbname);
 if ($conn_p->connect_error) {
     die("Connection failed: " . $conn_p->connect_error);
@@ -391,6 +391,11 @@ button:hover {
 </head>
 <body>
   <h1>Kah Yang's personal comments page</h1>
+  <div class="techno-border">
+  <div class="techno-box">
+    Update: The database I was previously using has expired and all the comments have been lost D: Don't worry though, this new database should last.
+  </div>
+</div>
     <h2 style="text-align:center; color:#00f0ff; margin-bottom:10px;">
   Visitors in the Last 7 Days
 </h2>
