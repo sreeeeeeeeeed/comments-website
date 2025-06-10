@@ -6,7 +6,7 @@ $servername = getenv("DB_HOST");
 $dbuser     = getenv("DB_USER");
 $dbpass     = getenv("DB_PASSWORD");
 $dbname     = getenv("DB_NAME");
-
+mysqli_close(mysqli_connect());
 $conn = new mysqli($servername, $dbuser, $dbpass, $dbname);
 if ($conn->connect_error) {
     die("DB Connection failed: " . $conn->connect_error);
@@ -22,7 +22,7 @@ if (isset($_POST['option_id'])) {
     $stmt->execute();
     $stmt->close();
 }
-
+$conn->close();
 // 3C) Redirect back to index.php so the user sees results
 header("Location: index.php?voted=1");
 exit();
